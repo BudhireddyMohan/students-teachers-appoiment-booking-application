@@ -1,0 +1,230 @@
+<html>
+    <head>
+        <title>
+             students teachers booking appoiments project
+        </title>
+      </head>
+      <body style="background-color: #33d6b6;">
+        <button onclick=logout()  style="float:right;">Logout</button> 
+        <script>
+          function logout()
+          {
+             window.location.href='index.html';
+          }
+        </script> 
+
+        <div id="userdisplay"></div><div>
+       <div style="height:710px;width:500px;border:2px solid black;float: left;"><br>
+       <CENTER> <button id="display">VIEW AVAIBLE SLOTS</button></CENTER>
+       <div id="container"></div>
+
+
+<!--------------------------------------------displaying avaible slot details------------------------------------------------------------------------->
+      <script>
+          
+    document.getElementById("display").addEventListener('click', async function() {
+      try {
+        const response = await fetch('http://localhost:3000/avaible-slots'); // Make sure to use the correct port number
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(data);
+        const length=data.length;
+        console.log(length);
+        for (let i = 0; i < length; i++) {
+    const container = document.getElementById('container');
+    const newDiv = document.createElement('div');
+    
+    newDiv.innerHTML = `
+        <div style="height: 120px; width: 280px; border: 2px solid black; margin: 5px; padding: 5px;">
+            <div style="display: flex; flex-direction: column;">
+                <div style="margin-bottom: 2px;">
+                    <span style="font-weight: bold;">TEACHER NAME:</span> ${data[i].teacher_name}
+                </div>
+                <div>
+                    <span style="font-weight: bold;">TEACHER EMAIL:</span> ${data[i].teacher_email}
+                </div>
+                <div>
+                    <span style="font-weight: bold;">SUBJECT:</span> ${data[i].subject}
+                </div>
+                 <div>
+                    <span style="font-weight: bold;">TOPIC:</span> ${data[i].topic}
+                </div>
+                 <div>
+                    <span style="font-weight: bold;">DATE:</span> ${data[i].date}
+                </div>
+                 <div>
+                    <span style="font-weight: bold;">TIME:</span> ${data[i].time}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(newDiv);
+}
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    });
+
+
+
+  </script>
+      
+       
+   
+       
+       </div>
+       <div style="height:710px;width:950px;float: right;margin-left:10px">
+        <div style="height:710px;width:390px;border:2px solid black;float: left;margin-left:10px">
+          
+        <center><h2>BOOK APPOIMENT<br></h2></center>
+        <center> <h5>
+          STUDENT NAME<br><br>
+          <input type="text" id="student-name"><br><br>
+
+          STUDENT EMAIL<br><br>
+          <input type="text" id="student-email"><br><br>
+
+          TEACHER NAME<br><br>
+          <input type="text" id="teacher-name"><br><br>
+
+          TEACHER MAIL<br><br>
+          <input type="text" id="teacher-email"><br><br>
+
+          SUBJECT<br><br>
+          <input type="text" id="subject"><br><br>
+
+          TOPIC<br><br>
+          <input type="text" id="topic"><br><br>
+
+          APPOINTMENT DATE<br><br>
+          <input type="date" id="date"><br><br>
+
+          APPOINTMENT TIME<br><br>
+          <input type="time" id="time"><br>
+      </h5><br>
+      <button id="book-appointment">BOOK APPOINTMENT</button>
+      </center>
+      
+        </div>
+        <div style="height:710px;width:390px;border:2px solid black;float: right;margin-left:10px;margin-right:80px;">
+          <center>
+            <br>
+          <button id="view-appointments">VIEW APPOIMENTS</button>
+          <pre id="displaystudentsappoiments"></pre>
+        </center>
+        </div>
+      </div>
+
+
+
+      <!---------------------------------script code for BOOK APPOIMENT----------------------------------------------------------------------------------->
+
+      <script>
+      
+            document.getElementById("book-appointment").addEventListener('click', async function(event) {
+              event.preventDefault();
+                const student_name = document.getElementById("student-name").value;
+                const student_email = document.getElementById("student-email").value;
+                const teacher_name = document.getElementById("teacher-name").value;
+                const teacher_email = document.getElementById("teacher-email").value;
+                const subject = document.getElementById("subject").value;
+                const topic = document.getElementById("subject").value;
+                const date = document.getElementById("date").value;
+                const time = document.getElementById("time").value;
+
+                console.log(student_name);
+                console.log(student_email);
+                console.log(teacher_name);
+                console.log(teacher_email);
+                console.log(subject)
+                console.log(topic);
+                console.log(date);
+                console.log(time);
+                try{
+                  const response=await fetch('http://localhost:3000/book-appointment',{
+                    method:'POST',
+                    headers:{
+                      'Content-Type':'application/json'
+                    },
+                    body:JSON.stringify({student_name:student_name,student_email:student_email,teacher_name:teacher_name,teacher_email,subject:subject,topic:topic,date:date,time:time,status:"pending"})
+                  })
+                  const data=await response.json();
+                 
+
+                }catch(error)
+                {
+                  console.log("error at inserting booking appoiments",error);
+                }
+                event.target.reset();
+});
+
+      </script>
+
+
+
+<!----------------------------------script for view appoiments------------------------------->
+
+<script>
+  let format="";
+document.addEventListener('DOMContentLoaded', () => {
+            // Retrieve data from localStorage
+            
+            const loginData = localStorage.getItem('loginData');
+            if (loginData) {
+                const data = JSON.parse(loginData);
+                console.log('Login Data:', data); 
+                format=data.email;
+                document.getElementById('userdisplay').innerHTML =`<h3>WELCOME <br> ${format}</h3>`
+                
+            }
+        });
+
+
+  document.getElementById("view-appointments").addEventListener('click', async function() {
+    try {
+      const response = await fetch('http://localhost:3000/view-appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ student_email: format})
+      });
+        
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+       console.log("maildetails"+format);
+      const data = await response.json();
+      console.log(data);
+    
+      console.log(data.length);
+      for (let i = 0; i < data.length; i++) {
+    
+    const dataFormat = `
+        <div style="height: 180px; width: 320px; border: 2px solid black;">
+Student Name: ${data[i].student_name}
+Phone Number:${data[i].student_email}
+Teacher Name:${data[i].teacher_name}
+Teacher Email: ${data[i].teacher_email}
+Subject: ${data[i].subject}
+Topic: ${data[i].topic}
+Date:${data[i].date}
+Time: ${data[i].time}
+<h4>Status:${data[i].status}</h4>
+        </div>
+    `;
+    const newDiv = document.createElement('div');
+    newDiv.innerHTML = dataFormat;
+    document.getElementById("displaystudentsappoiments").appendChild(newDiv);
+}
+    } catch (error) {
+      console.error('Fetch error:', error);
+    }
+  });
+</script>
+      
+</body>
+</html>

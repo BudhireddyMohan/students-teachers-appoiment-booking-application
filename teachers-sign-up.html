@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <title>
+         Students Seachers Booking Appoiments Project
+    </title>
+  </head>
+  <body style="background-color: #33d6b6;">
+    <center>
+        <div style="height:350px;width:300px;border: 2px solid black;margin-top:100px;">
+          <h3><u>Students Teacher Appoiment Booking Application</u></h3>
+        
+         <h3>Teachers Sign-up Page</h3>
+         <div>
+         <input type="text" placeholder="email" id="email"><br><br>
+         <input type="text" placeholder="password" id="password"><br><br>
+         <input type="text" placeholder="conformpassword"><br><br>
+         <button id="sign_up">sign-up</button>
+          <br>
+          <h5>Back To  <a href="index.html">Login</a></div></h5>
+        
+         </div>
+        </div>
+        </center>
+
+
+
+
+        <!-------------------------sign_up page script code----------------------->
+        <script>
+          document.getElementById("sign_up").addEventListener('click',async function()
+        {
+            try{
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
+                const response = await fetch('http://localhost:3000/teachers-sign-up', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email, password: password })
+                });
+                if (!response.ok) {
+                    throw new Error("Error at inserting data");
+                }
+                
+            } catch (error) {
+                console.log(error);
+            }
+        });
+    </script>
+    </body>
+  </html>

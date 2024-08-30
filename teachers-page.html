@@ -1,0 +1,308 @@
+<html>
+    <head>
+        <title>
+            students Teacher appoiment booking project
+        </title>
+    </head>
+    <body style="background-color: #33d6b6;">
+        <button onclick=logout()  style="float:right;">Logout</button> 
+        <script>
+          function logout()
+          {
+             window.location.href='index.html';
+          }
+        </script>
+        <div id="userdisplay"></div>
+       
+        <div>
+        <div style="height:700px;width:450px;border:2px solid black;float: right;"><br><center><button id="teacher-appoiments">APPOIMENTS</button></center>
+            <div id="teacher-appoiments-check">
+
+            </div>
+        </div>
+        
+
+         <!-----------------------------------------------------------------teachers Display slots appoiments accepting---------------------------------------------------------->
+
+       <script>
+ 
+
+const loginData = localStorage.getItem('loginData');
+const main = JSON.parse(loginData);  // Assuming loginData contains the JSON string with 'email' property
+
+console.log(main);           // Logs the 'main' object
+console.log(main.email);
+const email=main.email; 
+
+document.getElementById("teacher-appoiments").addEventListener('click',async function()
+{
+    try{
+        const response=await fetch('http://localhost:3000/teacher-appoiments-check',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            
+            body:JSON.stringify({teacher_email:email})
+        })
+        console.log(email);
+        console.log("data came")
+        const data=await response.json();
+        console.log(data);
+        const length=data.length;
+        console.log(length);
+        const container=document.getElementById("teacher-appoiments-check");
+        for (let i = 0; i < length; i++) {
+            const newDiv = document.createElement('div');
+            
+            newDiv.innerHTML = `
+                <div style="height: 140px; width: 280px; border: 2px solid black; margin: 5px; padding: 5px; background-color: white;">
+                    <div style="display: flex; flex-direction: column;">
+                        <div style="margin-bottom: 2px;">
+                            <div>
+                              <span style="font-weight: bold;">STUDENT NAME:</span> ${data[i].student_name}
+                        </div>
+                        <div>
+                            <span style="font-weight: bold;">TEACHER NAME:</span> ${data[i].teacher_name}
+                        </div>
+                        <div>
+                            <span style="font-weight: bold;">STUDENT EMAIL:</span> ${data[i].student_email}
+                        </div>
+                         <div>
+                            <span style="font-weight: bold;">DATE:</span> ${data[i].date}
+                        </div>
+                         <div>
+                            <span style="font-weight: bold;">TIME:</span> ${data[i].time}
+                        </div>
+                        <button onclick="handleAction(event, 'accept', '${data[i].teacher_email}', '${data[i].student_email}')">Accept</button>
+                        <button onclick="handleAction(event, 'reject', '${data[i].teacher_email}', '${data[i].student_email}')">Reject</button>
+                    </div>
+                </div>
+            `;
+           
+            container.appendChild(newDiv);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+function handleAction(event, action, teacher_email, student_email) {
+    if (action === 'accept') {
+        accept(student_email, teacher_email);
+    } else if (action === 'reject') {
+        reject(student_email, teacher_email);
+    }
+}
+
+async function accept(student_email, teacher_email) {
+    try {
+        const response = await fetch('http://localhost:3000/accept', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ student_email, teacher_email, status: "accepted" })
+        });
+        const data = await response.json();
+        if (data.ok) {
+            alert("accepted");
+        } else {
+            alert("Error in updating");
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        
+    }
+}
+
+async function reject(student_email, teacher_email) {
+    try {
+        const response = await fetch('http://localhost:3000/accept', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ student_email, teacher_email, status: "rejected" })
+        });
+        const data = await response.json();
+        if (data.ok) {
+            alert("reject");
+        } else {
+            alert("Error in updating");
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert("Error in updating");
+    }
+}
+</script>
+
+ <!-----------------------------------------------------------------------CREATE SLOTS-------------------------------------------------------------------------->
+
+
+        <div style="height:700px;width:450px;border:2px solid black;float: right;margin-right: 70px;"><br>
+            <center><button id="all-slots">CREATED SLOTS</button></center>
+            <div id="display-teachers-slots"></div>
+        </div>
+
+
+        <!-----------------------------------------------------------------teachers Display slots---------------------------------------------------------->
+
+        <script>
+            let format ="";
+        
+            document.addEventListener('DOMContentLoaded', () => {
+                // Retrieve data from localStorage
+                const loginData = localStorage.getItem('loginData');
+                if (loginData) {
+                    const data = JSON.parse(loginData);
+                    console.log('Login Data:', data); 
+                    format = data.email;
+                    document.getElementById('userdisplay').innerHTML = "<h5>WELCOME</h5>" + format;
+                    const maindata=format;
+                }
+            });
+        
+            document.getElementById("all-slots").addEventListener('click', async function() {
+                try {
+                    console.log(format);
+                    const response = await fetch('http://localhost:3000/teacher-slots', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'  // Corrected typo here
+                        },
+                        body: JSON.stringify({teacher_email: format })  // Corrected key here
+                    });
+        
+                    // Handle the response properly
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+        
+                    const data = await response.json();
+                    console.log(data);
+                    const length=data.length;
+        console.log(length);
+        for (let i = 0; i < length; i++) {
+    const container = document.getElementById('display-teachers-slots');
+    const newDiv = document.createElement('div');
+    
+    newDiv.innerHTML = `
+        <div style="height: 120px; width: 280px; border: 2px solid black; margin: 5px; padding: 5px;">
+            <div style="display: flex; flex-direction: column;">
+                <div style="margin-bottom: 2px;">
+                    <span style="font-weight: bold;">TEACHER NAME:</span> ${data[i].teacher_name}
+                </div>
+                <div>
+                    <span style="font-weight: bold;">TEACHER EMAIL:</span> ${data[i].teacher_email}
+                </div>
+                <div>
+                    <span style="font-weight: bold;">SUBJECT:</span> ${data[i].subject}
+                </div>
+                 <div>
+                    <span style="font-weight: bold;">TOPIC:</span> ${data[i].topic}
+                </div>
+                 <div>
+                    <span style="font-weight: bold;">DATE:</span> ${data[i].date}
+                </div>
+                 <div>
+                    <span style="font-weight: bold;">TIME:</span> ${data[i].time}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(newDiv);
+}
+                } catch (error) {
+                    console.log("Error fetching teacher slots:", error);
+                }
+            });
+
+        </script>
+        
+
+<!---------------------------------------------------------------creating slot-------------------------------------------------------------------------------------------->
+
+        <div style="height:700px;width:450px;border:2px solid black">
+            <center>
+
+            <h4>
+               <U> <h3>CREATE SLOT</h3>  </U><br><br>
+                TEACHER NAME<br>
+                <br>
+                <input type="text" id="teacher-name"><br><br><br>
+      
+                EMAIL<br><br>
+                <input type="text" id="teacher-email"><br><br><br>
+      
+                SUBJECT<br><br>
+                <input type="text" id="subject"><br><br><br>
+
+                TOPIC<br><br>
+                <input type="text" id="topic"><br><br><br>
+      
+                 DATE<br><br>
+                <input type="date" id="date"><br><br><br>
+      
+                TIME<br><br>
+                <input type="time" id="time"><br><br><br>
+                <button id="create-slot">create slot</button>
+            </h4>
+        </center>    
+        </div>
+
+        <!---------------------------------------------script code for creating slot----------------------------------------------------------------------->
+
+        <script>
+            document.getElementById('create-slot').addEventListener('click', async function() {
+                const teacher_name = document.getElementById("teacher-name").value;
+                const teacher_email = document.getElementById("teacher-email").value;
+                const subject = document.getElementById("subject").value;
+                const topic = document.getElementById("topic").value;
+                const date = document.getElementById("date").value;
+                const time = document.getElementById("time").value;
+                
+                console.log(teacher_name);
+                console.log(teacher_email);
+                console.log(subject);
+                console.log(topic);
+                console.log(date);
+                console.log(time);
+                
+                try {
+                    const response = await fetch('http://localhost:3000/create-slot', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            teacher_name: teacher_name,
+                            teacher_email: teacher_email,
+                            subject: subject,
+                            topic: topic,
+                            date: date,
+                            time: time
+                        })
+                    });
+                    
+                    // Check if response is ok
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+        
+                    // Try to parse JSON
+                    const data = await response.json();
+                    console.log(data);
+                } catch (error) {
+                    console.log("Error at inserting create slot", error);
+                }
+            });
+        </script>
+        
+    </div>
+</div>
+
+    </body>
+</html>
